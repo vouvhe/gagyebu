@@ -13,7 +13,7 @@
 - **카테고리별 지출 차트** — 도넛 차트로 지출 비율 시각화
 - **월별 수입/지출 차트** — 최근 6개월 막대 차트 비교
 - **거래 내역 테이블** — 수입/지출 필터링 및 삭제
-- **데이터 저장** — localStorage 사용으로 브라우저를 닫아도 유지
+- **데이터 저장** — Supabase PostgreSQL DB에 영구 저장 (클라우드 동기화)
 
 ## 기술 스택
 
@@ -23,6 +23,7 @@
 | 언어 | TypeScript |
 | 스타일 | Tailwind CSS |
 | 차트 | Chart.js + react-chartjs-2 |
+| 데이터베이스 | Supabase (PostgreSQL) |
 | 배포 | Vercel |
 | 소스 관리 | GitHub |
 
@@ -32,7 +33,7 @@
 gagyebu/
 ├── app/
 │   ├── layout.tsx       # 루트 레이아웃
-│   ├── page.tsx         # 메인 페이지 (상태 관리)
+│   ├── page.tsx         # 메인 페이지 (상태 관리, Supabase CRUD)
 │   └── globals.css      # 전역 스타일
 ├── components/
 │   ├── SummaryCards.tsx # 수입/지출/잔액 요약 카드
@@ -40,8 +41,11 @@ gagyebu/
 │   ├── EntryTable.tsx   # 거래 내역 테이블
 │   ├── DonutChart.tsx   # 카테고리별 지출 도넛 차트
 │   └── BarChart.tsx     # 월별 수입/지출 막대 차트
+├── lib/
+│   └── supabase.ts      # Supabase 클라이언트 초기화
 ├── types/
 │   └── index.ts         # 타입 정의 및 공통 상수
+├── .env.local           # 환경변수 (Supabase URL/Key, 미커밋)
 ├── deploy.ps1           # 배포 자동화 스크립트
 └── README.md            # 프로젝트 문서 (현재 파일)
 ```
@@ -63,6 +67,12 @@ npm run dev
 ```
 
 브라우저에서 http://localhost:3000 접속
+
+> **주의:** `.env.local` 파일에 Supabase URL과 anon key가 있어야 합니다.
+> ```
+> NEXT_PUBLIC_SUPABASE_URL=https://...supabase.co
+> NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+> ```
 
 ## 배포
 
@@ -160,3 +170,21 @@ Git 커밋 → GitHub Push → Vercel 배포까지 자동으로 처리됩니다.
   - 차트: 등장 시 scale + fade 애니메이션
   - 배경: 상단 블루 radial gradient 오버레이 추가
   - 커밋 → GitHub Push → Vercel 배포 완료
+
+#### 10. Supabase DB 연결 (MCP)
+- **문의:** gagyebu에 지금까지 내가 가계부를 만들었는데 여기에 디비를 연결하려고함 수페베이스의 MCP로 설정해줘
+- **작업 내용:**
+  - Supabase MCP 서버 OAuth 인증 완료 (project: `nlzrpagybtpvzjwlsbdu`)
+  - MCP `apply_migration`으로 `entries` 테이블 생성 (PostgreSQL, RLS 활성화)
+    - 컬럼: `id` / `date` / `type` / `description` / `category` / `amount` / `created_at`
+    - RLS 정책: SELECT / INSERT / DELETE 모두 anon 허용 (개인 앱)
+  - `@supabase/supabase-js` 설치
+  - `lib/supabase.ts` 생성 (createClient)
+  - `.env.local` 생성 (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY)
+  - `app/page.tsx` localStorage → Supabase CRUD로 전면 교체
+    - `fetchEntries`: 마운트 시 전체 조회 (날짜/created_at 내림차순)
+    - `addEntry`: INSERT 후 즉시 state 반영
+    - `deleteEntry`: DELETE 후 state 필터링
+    - DB 컬럼 `description` ↔ UI 필드 `desc` 매핑 처리
+  - Vercel 환경변수 추가 (`vercel env add`)
+  - GitHub Push → Vercel 프로덕션 배포 완료
