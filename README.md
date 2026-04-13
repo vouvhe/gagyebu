@@ -144,3 +144,19 @@ Git 커밋 → GitHub Push → Vercel 배포까지 자동으로 처리됩니다.
   - 차트 툴팁·범례·축 색상 모두 다크 테마에 맞게 조정
   - 헤더를 얇은 borderline 스타일로 변경 (로고 + 날짜만 표시)
   - 커밋 → GitHub Push → Vercel 배포 완료
+
+#### 9. 앱 이름 변경 + 애니메이션 추가
+- **문의:** 가계부라는 명도 조금 더 있어 보이게 바꿔주고 애니메이션 효과 같은 것도 있으면 넣어줘
+- **작업 내용:**
+  - 앱 이름 `가계부` → `VAULT FINANCE` 로 변경 (로고 V 아이콘 + 블루/인디고 그라디언트 글로우)
+  - `framer-motion` 설치 및 적용
+  - 페이지 진입 시 헤더 + 각 섹션 순차 fade-up 애니메이션 (stagger 0.08s)
+  - SummaryCards: 카드 hover 시 float-up / 숫자 카운트업 애니메이션 (cubic-ease)
+  - SummaryCards: 카드 상단 컬러 라인 (수입=초록, 지출=빨강, 잔액=파랑)
+  - EntryForm: 추가 버튼 그라디언트 + hover scale / tap scale 효과
+  - EntryForm: 내역 추가 성공 시 하단 컬러 플래시 애니메이션
+  - EntryTable: 새 행 slide-in / 삭제 행 fade-out (AnimatePresence)
+  - EntryTable: 행 개수 뱃지 pop 애니메이션 / del 버튼 hover 시만 표시
+  - 차트: 등장 시 scale + fade 애니메이션
+  - 배경: 상단 블루 radial gradient 오버레이 추가
+  - 커밋 → GitHub Push → Vercel 배포 완료

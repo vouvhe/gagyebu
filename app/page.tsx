@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Entry, formatKRW } from '@/types'
+import { motion } from 'framer-motion'
+import { Entry } from '@/types'
 import SummaryCards from '@/components/SummaryCards'
 import EntryForm from '@/components/EntryForm'
 import EntryTable from '@/components/EntryTable'
@@ -9,6 +10,15 @@ import DonutChart from '@/components/DonutChart'
 import BarChart from '@/components/BarChart'
 
 const STORAGE_KEY = 'gagyebu_entries'
+
+const fadeUp = {
+  hidden:  { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.08, duration: 0.45, ease: [0.22, 1, 0.36, 1] },
+  }),
+}
 
 export default function HomePage() {
   const [entries, setEntries] = useState<Entry[]>([])
@@ -26,9 +36,7 @@ export default function HomePage() {
 
   function addEntry(entry: Omit<Entry, 'id'>) {
     setEntries(prev =>
-      [...prev, { ...entry, id: Date.now() }].sort((a, b) =>
-        b.date.localeCompare(a.date)
-      )
+      [...prev, { ...entry, id: Date.now() }].sort((a, b) => b.date.localeCompare(a.date))
     )
   }
 
@@ -41,45 +49,71 @@ export default function HomePage() {
   const balance      = totalIncome - totalExpense
 
   return (
-    <div className="min-h-screen" style={{ background: '#0d1117' }}>
+    <div className="min-h-screen relative" style={{ background: '#0d1117' }}>
 
       {/* Header */}
-      <header style={{ borderBottom: '1px solid #1e2533' }} className="px-6 py-4">
+      <motion.header
+        initial={{ opacity: 0, y: -16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        style={{ borderBottom: '1px solid #1a1f2e' }}
+        className="px-6 py-4 relative z-10"
+      >
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded bg-blue-500 flex items-center justify-center text-white text-xs font-bold">
-              ₩
+            {/* Logo mark */}
+            <div className="relative">
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-black glow-blue"
+                style={{ background: 'linear-gradient(135deg,#3b82f6,#6366f1)', letterSpacing: '-1px' }}
+              >
+                V
+              </div>
+              <div
+                className="absolute inset-0 rounded-lg blur-md opacity-50"
+                style={{ background: 'linear-gradient(135deg,#3b82f6,#6366f1)' }}
+              />
             </div>
-            <span className="text-white font-semibold tracking-wide">가계부</span>
+            <div>
+              <span className="text-white font-black tracking-[0.2em] text-base">VAULT</span>
+              <span className="text-xs ml-2 tracking-widest" style={{ color: '#334155' }}>FINANCE</span>
+            </div>
           </div>
-          <span className="text-xs" style={{ color: '#4a5568' }}>
+          <span className="text-xs tracking-wider" style={{ color: '#334155' }}>
             {new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}
           </span>
         </div>
-      </header>
+      </motion.header>
 
-      <main className="max-w-5xl mx-auto px-4 py-6 flex flex-col gap-5">
+      <main className="max-w-5xl mx-auto px-4 py-7 flex flex-col gap-5 relative z-10">
 
-        <SummaryCards totalIncome={totalIncome} totalExpense={totalExpense} balance={balance} />
+        <motion.div custom={0} variants={fadeUp} initial="hidden" animate="visible">
+          <SummaryCards totalIncome={totalIncome} totalExpense={totalExpense} balance={balance} />
+        </motion.div>
 
-        <EntryForm onAdd={addEntry} />
+        <motion.div custom={1} variants={fadeUp} initial="hidden" animate="visible">
+          <EntryForm onAdd={addEntry} />
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div className="rounded-xl p-5" style={{ background: '#161b27', border: '1px solid #1e2533' }}>
-            <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: '#4a5568' }}>
+        <motion.div custom={2} variants={fadeUp} initial="hidden" animate="visible"
+          className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="rounded-xl p-5" style={{ background: '#111827', border: '1px solid #1a1f2e' }}>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] mb-4" style={{ color: '#334155' }}>
               카테고리별 지출
             </p>
             <DonutChart entries={entries} />
           </div>
-          <div className="rounded-xl p-5" style={{ background: '#161b27', border: '1px solid #1e2533' }}>
-            <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: '#4a5568' }}>
+          <div className="rounded-xl p-5" style={{ background: '#111827', border: '1px solid #1a1f2e' }}>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] mb-4" style={{ color: '#334155' }}>
               월별 수입 / 지출
             </p>
             <BarChart entries={entries} />
           </div>
-        </div>
+        </motion.div>
 
-        <EntryTable entries={entries} onDelete={deleteEntry} />
+        <motion.div custom={3} variants={fadeUp} initial="hidden" animate="visible">
+          <EntryTable entries={entries} onDelete={deleteEntry} />
+        </motion.div>
 
       </main>
     </div>

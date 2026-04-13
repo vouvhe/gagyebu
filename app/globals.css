@@ -9,13 +9,44 @@
   }
 
   input[type='date']::-webkit-calendar-picker-indicator {
-    filter: invert(0.6);
+    filter: invert(0.4);
     cursor: pointer;
   }
 
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: #0d1117; }
-  ::-webkit-scrollbar-thumb { background: #2d3748; border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: #4a5568; }
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #1e2533; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #2d3748; }
+}
+
+/* 배경 노이즈 텍스처 */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(59,130,246,0.08) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 글로우 효과 */
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1; }
+}
+
+.glow-blue  { animation: glow-pulse 3s ease-in-out infinite; }
+
+/* 카운트업 숫자 */
+@keyframes countup {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.countup { animation: countup 0.5s ease-out forwards; }
+
+/* 입력 포커스 글로우 */
+input:focus, select:focus {
+  border-color: rgba(59,130,246,0.6) !important;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.12);
 }

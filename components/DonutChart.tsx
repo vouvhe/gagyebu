@@ -1,5 +1,6 @@
 'use client'
 
+import { motion } from 'framer-motion'
 import { Doughnut } from 'react-chartjs-2'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import { Entry, CAT_COLORS, formatKRW } from '@/types'
@@ -13,8 +14,9 @@ export default function DonutChart({ entries }: Props) {
 
   if (expenses.length === 0) {
     return (
-      <div className="flex items-center justify-center h-52 text-xs" style={{ color: '#2d3748' }}>
-        지출 내역을 추가하면 표시됩니다
+      <div className="flex items-center justify-center h-52 text-xs tracking-widest uppercase"
+        style={{ color: '#1e293b' }}>
+        No data
       </div>
     )
   }
@@ -26,37 +28,38 @@ export default function DonutChart({ entries }: Props) {
   const colors = labels.map((_, i) => CAT_COLORS[i % CAT_COLORS.length])
 
   return (
-    <div className="h-52">
+    <motion.div
+      className="h-52"
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+    >
       <Doughnut
         data={{
           labels,
-          datasets: [{ data, backgroundColor: colors, borderWidth: 2, borderColor: '#161b27' }],
+          datasets: [{ data, backgroundColor: colors, borderWidth: 2, borderColor: '#111827', hoverBorderColor: '#111827' }],
         }}
         options={{
           responsive: true,
           maintainAspectRatio: false,
-          cutout: '65%',
+          cutout: '68%',
           plugins: {
             legend: {
               position: 'right',
-              labels: {
-                font: { size: 11 },
-                boxWidth: 10,
-                padding: 10,
-                color: '#64748b',
-              },
+              labels: { font: { size: 11 }, boxWidth: 8, padding: 12, color: '#475569' },
             },
             tooltip: {
-              backgroundColor: '#1e2533',
-              titleColor: '#94a3b8',
+              backgroundColor: '#1a1f2e',
+              titleColor: '#64748b',
               bodyColor: '#e2e8f0',
               borderColor: '#2d3748',
               borderWidth: 1,
-              callbacks: { label: ctx => ` ${ctx.label}: ${formatKRW(ctx.raw as number)}` },
+              padding: 10,
+              callbacks: { label: ctx => `  ${ctx.label}  ${formatKRW(ctx.raw as number)}` },
             },
           },
         }}
       />
-    </div>
+    </motion.div>
   )
 }
