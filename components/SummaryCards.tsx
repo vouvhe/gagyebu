@@ -7,22 +7,28 @@ interface Props {
 }
 
 export default function SummaryCards({ totalIncome, totalExpense, balance }: Props) {
+  const cards = [
+    { label: 'INCOME',  value: formatKRW(totalIncome),  color: '#10b981', sign: '+' },
+    { label: 'EXPENSE', value: formatKRW(totalExpense), color: '#f43f5e', sign: '-' },
+    { label: 'BALANCE', value: formatKRW(Math.abs(balance)), color: balance >= 0 ? '#3b82f6' : '#f43f5e', sign: balance >= 0 ? '' : '-' },
+  ]
+
   return (
     <div className="grid grid-cols-3 gap-4">
-      <div className="bg-white rounded-2xl shadow-sm p-5">
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">총 수입</p>
-        <p className="text-xl font-bold text-green-600">{formatKRW(totalIncome)}</p>
-      </div>
-      <div className="bg-white rounded-2xl shadow-sm p-5">
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">총 지출</p>
-        <p className="text-xl font-bold text-red-500">{formatKRW(totalExpense)}</p>
-      </div>
-      <div className="bg-white rounded-2xl shadow-sm p-5">
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">잔액</p>
-        <p className={`text-xl font-bold ${balance >= 0 ? 'text-blue-600' : 'text-red-500'}`}>
-          {formatKRW(balance)}
-        </p>
-      </div>
+      {cards.map(c => (
+        <div
+          key={c.label}
+          className="rounded-xl p-5"
+          style={{ background: '#161b27', border: '1px solid #1e2533' }}
+        >
+          <p className="text-xs font-semibold tracking-widest mb-3" style={{ color: '#4a5568' }}>
+            {c.label}
+          </p>
+          <p className="text-xl font-bold truncate" style={{ color: c.color }}>
+            {c.sign}{c.value}
+          </p>
+        </div>
+      ))}
     </div>
   )
 }
