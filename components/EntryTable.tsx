@@ -77,7 +77,7 @@ export default function EntryTable({ entries, onDelete }: Props) {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 20, transition: { duration: 0.2 } }}
-                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] as [number,number,number,number] }}
                   style={{ borderTop: '1px solid #0f1520' }}
                   className="group"
                   whileHover={{ backgroundColor: 'rgba(255,255,255,0.02)' }}

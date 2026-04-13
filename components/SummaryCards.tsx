@@ -41,7 +41,7 @@ function Card({ label, value, color, sign, delay }: {
     <motion.div
       initial={{ opacity: 0, y: 16, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ delay, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ delay, duration: 0.5, ease: [0.22, 1, 0.36, 1] as [number,number,number,number] }}
       whileHover={{ y: -2, transition: { duration: 0.2 } }}
       className="rounded-xl p-5 cursor-default"
       style={{ background: '#111827', border: '1px solid #1a1f2e', position: 'relative', overflow: 'hidden' }}
