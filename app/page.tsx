@@ -1,14 +1,15 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Entry } from '@/types'
-import { supabase } from '@/lib/supabase'
 import SummaryCards from '@/components/SummaryCards'
 import EntryForm from '@/components/EntryForm'
 import EntryTable from '@/components/EntryTable'
 import DonutChart from '@/components/DonutChart'
 import BarChart from '@/components/BarChart'
+
+const STORAGE_KEY = 'gagyebu_entries'
 
 const easing = [0.22, 1, 0.36, 1] as [number, number, number, number]
 
@@ -22,42 +23,27 @@ const fadeUp = {
 
 export default function HomePage() {
   const [entries, setEntries]   = useState<Entry[]>([])
-  const [loading, setLoading]   = useState(true)
+  const [hydrated, setHydrated] = useState(false)
 
-  /* ── 전체 조회 ── */
-  const fetchEntries = useCallback(async () => {
-    const { data, error } = await supabase
-      .from('entries')
-      .select('*')
-      .order('date', { ascending: false })
-      .order('created_at', { ascending: false })
-
-    if (!error && data) {
-      setEntries(data.map(r => ({ ...r, desc: r.description })))
-    }
-    setLoading(false)
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    if (saved) setEntries(JSON.parse(saved))
+    setHydrated(true)
   }, [])
 
-  useEffect(() => { fetchEntries() }, [fetchEntries])
+  useEffect(() => {
+    if (hydrated) localStorage.setItem(STORAGE_KEY, JSON.stringify(entries))
+  }, [entries, hydrated])
 
   /* ── 추가 ── */
-  async function addEntry(entry: Omit<Entry, 'id'>) {
-    const { data, error } = await supabase
-      .from('entries')
-      .insert({ date: entry.date, type: entry.type, description: entry.desc, category: entry.category, amount: entry.amount })
-      .select()
-      .single()
-
-    if (!error && data) {
-      const newEntry: Entry = { ...data, desc: data.description }
-      setEntries(prev => [newEntry, ...prev].sort((a, b) => b.date.localeCompare(a.date)))
-    }
+  function addEntry(entry: Omit<Entry, 'id'>) {
+    const newEntry: Entry = { ...entry, id: Date.now() }
+    setEntries(prev => [newEntry, ...prev].sort((a, b) => b.date.localeCompare(a.date)))
   }
 
   /* ── 삭제 ── */
-  async function deleteEntry(id: number) {
-    const { error } = await supabase.from('entries').delete().eq('id', id)
-    if (!error) setEntries(prev => prev.filter(e => e.id !== id))
+  function deleteEntry(id: number) {
+    setEntries(prev => prev.filter(e => e.id !== id))
   }
 
   const totalIncome  = entries.filter(e => e.type === 'income').reduce((s, e) => s + e.amount, 0)
@@ -91,11 +77,6 @@ export default function HomePage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {loading && (
-              <span className="text-xs tracking-widest animate-pulse" style={{ color: '#334155' }}>
-                loading...
-              </span>
-            )}
             <span className="text-xs tracking-wider" style={{ color: '#334155' }}>
               {new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}
             </span>
